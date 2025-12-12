@@ -299,6 +299,10 @@ static bool dolby_vision_use_source_meta_levels = false;
 module_param(dolby_vision_use_source_meta_levels, bool, 0664);
 MODULE_PARM_DESC(dolby_vision_use_source_meta_levels, "\n dolby_vision_use_source_meta_levels\n");
 
+static bool xbmc_dv_hdr10plus_conv = false;
+module_param(xbmc_dv_hdr10plus_conv, bool, 0664);
+MODULE_PARM_DESC(xbmc_dv_hdr10plus_conv, "\n xbmc_dv_hdr10plus_conv\n");
+
 // 0 - discard if present
 // 1 - keep with source values or inject with zero values if missing
 // 2 - keep with zero values   or inject with zero values if missing
@@ -4764,13 +4768,38 @@ static inline void load_dolby_vsvdb(const struct dv_info *dv_info)
 
 #define ETSI_META_OFFSET 71
 #define CORE_META_LENGTH 512
-#define LEVEL_5_LENGTH 13
 
-#define LEVEL_5_ZERO_DATA         \
+#define LEVEL_3_LENGTH 11
+#define LEVEL_3_DATA         \
+  "\x00\x00\x00\x06"  /* size  */ \
+  "\x03"              /* level */ \
+  "\x08\x00\x08\x00"  /* data  */ \
+  "\x08\x00"          /* data  */
+
+#define LEVEL_5_LENGTH 13
+#define LEVEL_5_DATA         \
   "\x00\x00\x00\x08"  /* size  */ \
   "\x05"              /* level */ \
   "\x00\x00\x00\x00"  /* data  */ \
   "\x00\x00\x00\x00"  /* data  */
+
+#define LEVEL_9_LENGTH 6
+#define LEVEL_9_DATA         \
+  "\x00\x00\x00\x01"  /* size  */ \
+  "\x09"              /* level */ \
+  "\x00"              /* data  */
+
+#define LEVEL_11_LENGTH 9
+#define LEVEL_11_DATA         \
+  "\x00\x00\x00\x04"  /* size  */ \
+  "\x0B"              /* level */ \
+  "\x01\x10\x00\x00"  /* data  */
+
+#define LEVEL_254_LENGTH 7
+#define LEVEL_254_DATA       \
+  "\x00\x00\x00\x02"  /* size  */ \
+  "\xFE"              /* level */ \
+  "\x00\x02"          /* data  */
 
 static unsigned char reversed_meta_buffer[CORE_META_LENGTH];
 static unsigned char combo_meta_buffer[CORE_META_LENGTH];
@@ -4849,6 +4878,9 @@ static inline void source_meta_copy(
   size_t remaining_input = orig_meta_size - ETSI_META_OFFSET;
 
   uint8_t num_levels = 0;
+  uint8_t level = 0;
+  bool level_1_done = false;
+  bool level_3_done = false;
   bool level_5_handled = (dolby_vision_keep_source_meta_level_5 == 0);
 
   while ((orig_index < orig_end_index) &&
@@ -4856,7 +4888,7 @@ static inline void source_meta_copy(
          (remaining_space >= 5)) {
 
     size_t level_size = be32_to_cpup((__be32 *)orig_index);
-    uint8_t level = orig_index[4];
+    level = orig_index[4];
     level_size += 5; // complete level size includes the space for the size information itself (4) and level (1)
 
     if (level_size > remaining_space || level_size > remaining_input) {
@@ -4876,7 +4908,7 @@ static inline void source_meta_copy(
           pr_err("Invalid metadata: Level 5 size mismatch (%zu)\n", level_size);
           break;
         }
-        memcpy(combo_index, LEVEL_5_ZERO_DATA, LEVEL_5_LENGTH);
+        memcpy(combo_index, LEVEL_5_DATA, LEVEL_5_LENGTH);
         combo_index += LEVEL_5_LENGTH;
         combo_meta_size += LEVEL_5_LENGTH;
         remaining_space -= LEVEL_5_LENGTH;
@@ -4894,11 +4926,48 @@ static inline void source_meta_copy(
       combo_meta_size += level_size;
       remaining_space -= level_size;
       num_levels++;
-	  if (level == 5) level_5_handled = true;
+      if (level == 5) level_5_handled = true;
+      if (level == 1) level_1_done = true;
+      if (level == 3) level_3_done = true;
     }
 
     orig_index += level_size;
     remaining_input -= level_size;
+  }
+
+  if ((level < 3) && level_1_done && xbmc_dv_hdr10plus_conv) {
+    memcpy(combo_index, LEVEL_3_DATA, LEVEL_3_LENGTH);
+    combo_index += LEVEL_3_LENGTH;
+    combo_meta_size += LEVEL_3_LENGTH;
+    num_levels++;
+  }
+
+  if ((level < 5) && level_1_done) {
+    memcpy(combo_index, LEVEL_5_DATA, LEVEL_5_LENGTH);
+    combo_index += LEVEL_5_LENGTH;
+    combo_meta_size += LEVEL_5_LENGTH;
+    num_levels++;
+  }
+
+  if ((level < 9) && level_1_done && xbmc_dv_hdr10plus_conv) {
+    memcpy(combo_index, LEVEL_9_DATA, LEVEL_9_LENGTH);
+    combo_index += LEVEL_9_LENGTH;
+    combo_meta_size += LEVEL_9_LENGTH;
+    num_levels++;
+  }
+
+  if ((level < 11) && level_1_done && xbmc_dv_hdr10plus_conv) {
+    memcpy(combo_index, LEVEL_11_DATA, LEVEL_11_LENGTH);
+    combo_index += LEVEL_11_LENGTH;
+    combo_meta_size += LEVEL_11_LENGTH;
+    num_levels++;
+  }
+
+  if ((level < 254) && level_1_done && xbmc_dv_hdr10plus_conv) {
+    memcpy(combo_index, LEVEL_254_DATA, LEVEL_254_LENGTH);
+    combo_index += LEVEL_254_LENGTH;
+    combo_meta_size += LEVEL_254_LENGTH;
+    num_levels++;
   }
 
   combo_meta_buffer[ETSI_META_OFFSET-1] = num_levels; // update number of levels.
