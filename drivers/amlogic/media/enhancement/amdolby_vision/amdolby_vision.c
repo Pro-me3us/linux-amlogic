@@ -266,13 +266,17 @@ static unsigned int dolby_vision_flags = FLAG_BYPASS_VPP | FLAG_FORCE_CVM;
 module_param(dolby_vision_flags, uint, 0664);
 MODULE_PARM_DESC(dolby_vision_flags, "\n dolby_vision_flags\n");
 
-static unsigned int dolby_vision_dolby_vsvdb_inject = 0;
-module_param(dolby_vision_dolby_vsvdb_inject, uint, 0664);
-MODULE_PARM_DESC(dolby_vision_dolby_vsvdb_inject, "\n dolby_vision_dolby_vsvdb_inject\n");
+static bool xbmc_dv_vsvdb_inject = false;
+module_param(xbmc_dv_vsvdb_inject, bool, 0664);
+MODULE_PARM_DESC(xbmc_dv_vsvdb_inject, "\n xbmc_dv_vsvdb_inject\n");
 
-static char *dolby_vision_dolby_vsvdb_payload = "";
-module_param(dolby_vision_dolby_vsvdb_payload, charp, 0664);
-MODULE_PARM_DESC(dolby_vision_dolby_vsvdb_payload, "\n dolby_vision_dolby_vsvdb_payload\n");
+static unsigned int xbmc_dv_vsvdb_inject_num = 0;
+module_param(xbmc_dv_vsvdb_inject_num, uint, 0664);
+MODULE_PARM_DESC(xbmc_dv_vsvdb_inject_num, "\n xbmc_dv_vsvdb_inject_num\n");
+
+static char *xbmc_dv_vsvdb_payload = "";
+module_param(xbmc_dv_vsvdb_payload, charp, 0664);
+MODULE_PARM_DESC(xbmc_dv_vsvdb_payload, "\n xbmc_dv_vsvdb_payload\n");
 
 // 0 - no change
 // 1 - limit min and max
@@ -299,26 +303,25 @@ static bool dolby_vision_use_source_meta_levels = false;
 module_param(dolby_vision_use_source_meta_levels, bool, 0664);
 MODULE_PARM_DESC(dolby_vision_use_source_meta_levels, "\n dolby_vision_use_source_meta_levels\n");
 
+static unsigned int xbmc_dv_profile = 0;
+module_param(xbmc_dv_profile, uint, 0664);
+MODULE_PARM_DESC(xbmc_dv_profile, "\n xbmc_dv_profile\n");
+
 static bool xbmc_dv_hdr10plus_conv = false;
 module_param(xbmc_dv_hdr10plus_conv, bool, 0664);
 MODULE_PARM_DESC(xbmc_dv_hdr10plus_conv, "\n xbmc_dv_hdr10plus_conv\n");
 
-// 0 - discard if present
-// 1 - keep with source values or inject with zero values if missing
-// 2 - keep with zero values   or inject with zero values if missing
-// 3 - OSD and subtitles off: keep with source values or inject with zero values if missing
-//     else:                  keep with zero values   or inject with zero values if missing
-// 4 - OSD off: keep with source values or inject with zero values if missing
-//     else:  	keep with zero values   or inject with zero values if missing
-static unsigned int dolby_vision_keep_source_meta_level_5 = 0;
-module_param(dolby_vision_keep_source_meta_level_5, uint, 0664);
-MODULE_PARM_DESC(dolby_vision_keep_source_meta_level_5, "\n dolby_vision_keep_source_meta_level_5\n");
+static unsigned int xbmc_dv_type = 0;
+module_param(xbmc_dv_type, uint, 0664);
+MODULE_PARM_DESC(xbmc_dv_type, "\n xbmc_dv_type\n");
 
-// 0 - discard if present
-// 1 - keep with source values
-static unsigned int dolby_vision_keep_source_meta_level_6 = 0;
-module_param(dolby_vision_keep_source_meta_level_6, uint, 0664);
-MODULE_PARM_DESC(dolby_vision_keep_source_meta_level_6, "\n dolby_vision_keep_source_meta_level_6\n");
+static bool xbmc_meta_level_5 = false;
+module_param(xbmc_meta_level_5, bool, 0664);
+MODULE_PARM_DESC(xbmc_meta_level_5, "\n xbmc_meta_level_5\n");
+
+static bool xbmc_meta_level_5_osdst = false;
+module_param(xbmc_meta_level_5_osdst, bool, 0664);
+MODULE_PARM_DESC(xbmc_meta_level_5_osdst, "\n xbmc_meta_level_5_osdst\n");
 
 // 0 (integer value for false) - subtitles OFF
 // 1 (integer value for true) - subtitles ON
@@ -342,6 +345,75 @@ MODULE_PARM_DESC(dolby_vision_chroma, "\n dolby_vision_chroma\n");
 static unsigned int dolby_vision_signal_range = 0;
 module_param(dolby_vision_signal_range, uint, 0664);
 MODULE_PARM_DESC(dolby_vision_signal_range, "\n dolby_vision_signal_range\n");
+
+/* xbmc DV video processor mode (0=off, 1=HDR, 2=HDR2, etc.) */
+static unsigned int xbmc_dv_vp_tm;
+module_param(xbmc_dv_vp_tm, uint, 0664);
+MODULE_PARM_DESC(xbmc_dv_vp_tm, "\n xbmc_dv_vp_tm\n");
+
+unsigned int xbmc_dv_vp; // extern
+module_param(xbmc_dv_vp, uint, 0664);
+MODULE_PARM_DESC(xbmc_dv_vp, "\n xbmc_dv_vp\n");
+
+bool xbmc_aml_linux_force_422; // extern
+module_param(xbmc_aml_linux_force_422, bool, 0664);
+MODULE_PARM_DESC(xbmc_aml_linux_force_422, "\n xbmc_aml_linux_force_422\n");
+
+static bool xbmc_dv_hdr10_for_dv_ll = false;
+module_param(xbmc_dv_hdr10_for_dv_ll, bool, 0664);
+MODULE_PARM_DESC(xbmc_dv_hdr10_for_dv_ll, "\n xbmc_dv_hdr10_for_dv_ll\n");
+
+static unsigned int xbmc_dv_hdr10_for_dv_ll_inject_num = 0;
+module_param(xbmc_dv_hdr10_for_dv_ll_inject_num, uint, 0664);
+MODULE_PARM_DESC(xbmc_dv_hdr10_for_dv_ll_inject_num, "\n xbmc_dv_hdr10_for_dv_ll_inject_num\n");
+
+static unsigned int xbmc_dv_el_type = 0;
+module_param(xbmc_dv_el_type, uint, 0664);
+MODULE_PARM_DESC(xbmc_dv_el_type, "\n xbmc_dv_el_type\n");
+
+static unsigned int xbmc_dv_vsvdb_source_lum_limit_num = 0;
+module_param(xbmc_dv_vsvdb_source_lum_limit_num, uint, 0664);
+MODULE_PARM_DESC(xbmc_dv_vsvdb_source_lum_limit_num, "\n xbmc_dv_vsvdb_source_lum_limit_num\n");
+
+static u16 xbmc_dv_md_source_max_pq = 0;
+module_param(xbmc_dv_md_source_max_pq, ushort, 0664);
+MODULE_PARM_DESC(xbmc_dv_md_source_max_pq, "\n xbmc_dv_md_source_max_pq\n");
+
+static u16 xbmc_dv_md_source_min_pq = 0;
+module_param(xbmc_dv_md_source_min_pq, ushort, 0664);
+MODULE_PARM_DESC(xbmc_dv_md_source_min_pq, "\n xbmc_dv_md_source_min_pq\n");
+
+static u16 xbmc_dv_md_level_6_max_lum = 0;
+module_param(xbmc_dv_md_level_6_max_lum, ushort, 0664);
+MODULE_PARM_DESC(xbmc_dv_md_level_6_max_lum, "\n xbmc_dv_md_level_6_max_lum\n");
+
+static u16 xbmc_dv_md_level_6_min_lum = 0;
+module_param(xbmc_dv_md_level_6_min_lum, ushort, 0664);
+MODULE_PARM_DESC(xbmc_dv_md_level_6_min_lum, "\n xbmc_dv_md_level_6_min_lum\n");
+
+static u16 xbmc_dv_md_level_6_max_cll = 0;
+module_param(xbmc_dv_md_level_6_max_cll, ushort, 0664);
+MODULE_PARM_DESC(xbmc_dv_md_level_6_max_cll, "\n xbmc_dv_md_level_6_max_cll\n");
+
+static u16 xbmc_dv_md_level_6_max_fall = 0;
+module_param(xbmc_dv_md_level_6_max_fall, ushort, 0664);
+MODULE_PARM_DESC(xbmc_dv_md_level_6_max_fall, "\n xbmc_dv_md_level_6_max_fall\n");
+
+static u32 xbmc_dv_hdr10_max_lum = 0;
+module_param(xbmc_dv_hdr10_max_lum, uint, 0664);
+MODULE_PARM_DESC(xbmc_dv_hdr10_max_lum, "\n xbmc_dv_hdr10_max_lum\n");
+
+static u32 xbmc_dv_hdr10_min_lum = 0;
+module_param(xbmc_dv_hdr10_min_lum, uint, 0664);
+MODULE_PARM_DESC(xbmc_dv_hdr10_min_lum, "\n xbmc_dv_hdr10_min_lum\n");
+
+static u16 xbmc_dv_hdr10_max_cll = 0;
+module_param(xbmc_dv_hdr10_max_cll, ushort, 0664);
+MODULE_PARM_DESC(xbmc_dv_hdr10_max_cll, "\n xbmc_dv_hdr10_max_cll\n");
+
+static u16 xbmc_dv_hdr10_max_fall = 0;
+module_param(xbmc_dv_hdr10_max_fall, ushort, 0664);
+MODULE_PARM_DESC(xbmc_dv_hdr10_max_fall, "\n xbmc_dv_hdr10_max_fall\n");
 
 /*bit0:reset core1 reg; bit1:reset core2 reg;bit2:reset core3 reg*/
 /*bit3: reset core1 lut; bit4: reset core2 lut*/
@@ -562,6 +634,10 @@ static u32 debug_bypass_vpp_pq;
 static bool module_installed;
 
 #define MAX_PARAM   8
+static inline bool is_dv_ll(void)
+{
+	return (dolby_vision_flags & FLAG_FORCE_DOVI_LL) || (dolby_vision_ll_policy >= DOLBY_VISION_LL_YUV422);
+}
 static inline bool is_meson_gxm(void)
 {
 	return (dv_meson_dev.cpu_id == _CPU_MAJOR_ID_GXM);
@@ -1338,6 +1414,8 @@ static int dolby_core1_set
   if (dolby_vision_flags & FLAG_BYPASS_CVM) bypass_flag |= 1 << 2;
   if (need_skip_cvm(0)) bypass_flag |= 1 << 2;
   if (el_41_mode) bypass_flag |= 1 << 3;
+  if (xbmc_dv_vp != 0 && xbmc_dv_vp_tm > 2) bypass_flag |= 1 << 1; /* VP: bypass CSC */
+  if (xbmc_dv_vp != 0 && xbmc_dv_vp_tm > 1) bypass_flag |= 1 << 2; /* VP: bypass CVM */
 
   VSYNC_WR_DV_REG(DOLBY_CORE1_REG_START + 1, 0x70 | bypass_flag); /* bypass CVM and/or CSC */
   VSYNC_WR_DV_REG(DOLBY_CORE1_REG_START + 1, 0x70 | bypass_flag); /* for delay */
@@ -1554,6 +1632,7 @@ static int dolby_core2_set
   VSYNC_WR_DV_REG(DOLBY_CORE2A_REG_START + 2, 1);
 
   if (need_skip_cvm(1)) bypass_flag |= 1 << 0;
+  if (xbmc_dv_vp != 0 && xbmc_dv_vp_tm > 1) bypass_flag |= 1 << 0; /* VP: bypass CVM */
 
   VSYNC_WR_DV_REG(DOLBY_CORE2A_REG_START + 2, 1);
   VSYNC_WR_DV_REG(DOLBY_CORE2A_REG_START + 1, 2 | bypass_flag);
@@ -1752,8 +1831,14 @@ static int dolby_core3_set
   /*   02- HDR10 output, RGB 10 bit 444 PQ*/
   /*   03- Deep color SDR, RGB 10 bit 444 Gamma*/
   /*   04- SDR, RGB 8 bit 444 Gamma*/
-  VSYNC_WR_DV_REG(DOLBY_CORE3_REG_START + 1, cur_dv_mode);
-  VSYNC_WR_DV_REG(DOLBY_CORE3_REG_START + 1, cur_dv_mode);
+  if (xbmc_dv_vp != 0 && xbmc_dv_vp_tm > 3) {
+    /* VP: force IPT 12-bit 444 bypass */
+    VSYNC_WR_DV_REG(DOLBY_CORE3_REG_START + 1, 0x00);
+    VSYNC_WR_DV_REG(DOLBY_CORE3_REG_START + 1, 0x00);
+  } else {
+    VSYNC_WR_DV_REG(DOLBY_CORE3_REG_START + 1, cur_dv_mode);
+    VSYNC_WR_DV_REG(DOLBY_CORE3_REG_START + 1, cur_dv_mode);
+  }
 
   /* for delay */
 
@@ -2626,7 +2711,7 @@ static int dvel_receiver_event_fun(int type, void *data, void *arg)
 		}
 
 		spin_unlock_irqrestore(&dovi_lock, flags);
-		if (dolby_vision_hdr_inject == 0) memset(&hdr10_data, 0, sizeof(hdr10_data));
+		if (!xbmc_dv_hdr10_for_dv_ll) memset(&hdr10_data, 0, sizeof(hdr10_data));
 		memset(&hdr10_param, 0, sizeof(hdr10_param));
 		frame_count = 0;
 		setting_update_count = 0;
@@ -2642,7 +2727,7 @@ static int dvel_receiver_event_fun(int type, void *data, void *arg)
 		for (i = 0; i < 16; i++)
 			dv_vf[i][0] = dv_vf[i][1] = NULL;
 		spin_unlock_irqrestore(&dovi_lock, flags);
-		if (dolby_vision_hdr_inject == 0) memset(&hdr10_data, 0, sizeof(hdr10_data));
+		if (!xbmc_dv_hdr10_for_dv_ll) memset(&hdr10_data, 0, sizeof(hdr10_data));
 		memset(&hdr10_param, 0, sizeof(hdr10_param));
 		frame_count = 0;
 		setting_update_count = 0;
@@ -4086,7 +4171,8 @@ static int prepare_vsif_pkt
 
 	if (vinfo->vout_device->dv_info &&
 	    vinfo->vout_device->dv_info->sup_backlight_control &&
-	    (setting->ext_md.avail_level_mask & EXT_MD_LEVEL_2)) 
+	    (setting->ext_md.avail_level_mask & EXT_MD_LEVEL_2) &&
+	    (xbmc_dv_vp == 0))
 	{
 		vsif->vers.ver2.backlt_ctrl_MD_present = 1;
 		vsif->vers.ver2.eff_tmax_PQ_hi = setting->ext_md.level_2.target_max_pq_h & 0xf;
@@ -4098,7 +4184,8 @@ static int prepare_vsif_pkt
 	}
 
 	if (setting->dovi_ll_enable &&
-	    (setting->ext_md.avail_level_mask & EXT_MD_LEVEL_255)) 
+	    (setting->ext_md.avail_level_mask & EXT_MD_LEVEL_255) &&
+	    (xbmc_dv_vp == 0))
 	{
 		vsif->vers.ver2.auxiliary_MD_present = 1;
 		vsif->vers.ver2.auxiliary_runmode = setting->ext_md.level_255.run_mode;
@@ -4145,6 +4232,211 @@ static u32 get_swap_endian_u32(char* input)
 
 	ret = kstrtol(data, 16, &result);
 	return (ret == 0) ? (u32)result : 0;
+}
+
+/* SMPTE ST.2084 (min) direct PQ lookup table */
+static const u16 min_direct_to_pq_lut[128] = {
+    0,   5,  12,  19,  26,  33,  40,  47,  55,  62,  69,  76,  83,  90,  97, 104,
+  111, 117, 124, 130, 137, 143, 150, 156, 162, 168, 174, 180, 186, 192, 198, 204,
+  210, 216, 221, 227, 233, 238, 244, 249, 254, 260, 265, 270, 276, 281, 286, 291,
+  296, 301, 306, 311, 316, 321, 326, 331, 335, 340, 345, 350, 354, 359, 364, 368,
+  373, 377, 382, 386, 391, 395, 399, 404, 408, 412, 417, 421, 425, 429, 433, 438,
+  442, 446, 450, 454, 458, 462, 466, 470, 474, 478, 482, 486, 490, 493, 497, 501,
+  505, 509, 512, 516, 520, 524, 527, 531, 535, 538, 542, 545, 549, 553, 556, 560,
+  563, 567, 570, 574, 577, 580, 584, 587, 591, 594, 597, 601, 604, 607, 611, 614
+};
+
+/* SMPTE ST.2084 (max) direct PQ lookup table */
+static const u16 xbmc_max_direct_to_pq_lut[128] = {
+  2081, 2249, 2372, 2467, 2547, 2614, 2672, 2724, 2771, 2813, 2851, 2887, 2920, 2950, 2979, 3006,
+  3032, 3056, 3079, 3101, 3121, 3141, 3160, 3178, 3196, 3213, 3229, 3245, 3260, 3275, 3289, 3302,
+  3316, 3329, 3341, 3354, 3365, 3377, 3388, 3399, 3410, 3421, 3431, 3441, 3451, 3460, 3470, 3479,
+  3488, 3497, 3505, 3514, 3522, 3530, 3538, 3546, 3554, 3561, 3569, 3576, 3583, 3590, 3597, 3604,
+  3611, 3618, 3624, 3631, 3637, 3643, 3649, 3656, 3662, 3668, 3673, 3679, 3685, 3690, 3696, 3702,
+  3707, 3712, 3718, 3723, 3728, 3733, 3738, 3743, 3748, 3753, 3758, 3762, 3767, 3772, 3776, 3781,
+  3785, 3790, 3794, 3799, 3803, 3807, 3811, 3816, 3820, 3824, 3828, 3832, 3836, 3840, 3844, 3848,
+  3852, 3855, 3859, 3863, 3867, 3870, 3874, 3878, 3881, 3885, 3888, 3892, 3895, 3899, 3902, 3906
+};
+
+static const u16 xbmc_max_direct_to_nits_lut[128] = {
+   100,  150,  200,  250,  300,  350,  400,  450,  500,  550,  600,  650,  700,  750,  800,  850,
+   900,  950, 1000, 1050, 1100, 1150, 1200, 1250, 1300, 1350, 1400, 1450, 1500, 1550, 1600, 1650,
+  1700, 1750, 1800, 1850, 1900, 1950, 2000, 2050, 2100, 2150, 2200, 2250, 2300, 2350, 2400, 2450,
+  2500, 2550, 2600, 2650, 2700, 2750, 2800, 2850, 2900, 2950, 3000, 3050, 3100, 3150, 3200, 3250,
+  3300, 3350, 3400, 3450, 3500, 3550, 3600, 3650, 3700, 3750, 3800, 3850, 3900, 3950, 4000, 4050,
+  4100, 4150, 4200, 4250, 4300, 4350, 4400, 4450, 4500, 4550, 4600, 4650, 4700, 4750, 4800, 4850,
+  4900, 4950, 5000, 5050, 5100, 5150, 5200, 5250, 5300, 5350, 5400, 5450, 5500, 5550, 5600, 5650,
+  5700, 5750, 5800, 5850, 5900, 5950, 6000, 6050, 6100, 6150, 6200, 6250, 6300, 6350, 6400, 6450
+};
+
+static const u16 xbmc_max_direct_to_pq_lut_2[32] = {
+  2055, 2120, 2185, 2250, 2315, 2380, 2445, 2510, 2575, 2640, 2705, 2770, 2835, 2900, 2965, 3030,
+  3095, 3160, 3225, 3290, 3355, 3420, 3485, 3550, 3615, 3680, 3745, 3810, 3875, 3940, 4005, 4070
+};
+
+static const u16 xbmc_max_direct_to_nits_lut_2_adj[32] = {
+    94,  110,  129,  150,  175,  204,  237,  276,  320,  372,  431,  499,  578,  670,  775,  897,
+  1037, 1200, 1387, 1605, 1856, 2147, 2485, 2876, 3330, 3857, 4470, 5183, 6014, 6982, 8113, 9434
+};
+
+static u32 bt709_primaries[3][2] = {
+	{0.3   * INORM + 0.5, 0.6   * INORM + 0.5}, /* G */
+	{0.15  * INORM + 0.5, 0.06  * INORM + 0.5}, /* B */
+	{0.64  * INORM + 0.5, 0.33  * INORM + 0.5}  /* R */
+};
+
+static u32 d65_white_point[2] = {
+	0.3127 * INORM + 0.5, 0.3290 * INORM + 0.5
+};
+
+static inline u8 xbmc_find_closest_lut_index(u16 value, const u16 *lut, int lut_size)
+{
+	u8 low = 0, high = (lut_size - 1);
+
+	if (value <= lut[low]) return low;
+	if (value >= lut[high]) return high;
+
+	while ((high - low) > 1) {
+		u8 mid = (low + high) / 2;
+		if (lut[mid] == value) return mid;
+		(lut[mid] < value) ? (low = mid) : (high = mid);
+	}
+
+	return ((value - lut[low]) < (lut[high] - value)) ? low : high;
+}
+
+static inline void set_dolby_vsvdb_source_cs(void)
+{
+	const unsigned char *x = &new_dovi_setting.vsvdb_tbl[5];
+	const unsigned char version = (x[0] >> 5) & 0x07;
+	unsigned char cs = 0;
+
+	memset(hdr10_data.primaries, 0, sizeof(hdr10_data.primaries));
+	memset(hdr10_data.white_point, 0, sizeof(hdr10_data.white_point));
+
+	switch (version) {
+	case 0:
+		cs = (x[5] << 4) | (x[4] >> 4);
+		break;
+	case 1:
+		cs = (new_dovi_setting.vsvdb_len == 15) ? x[7] : (x[4] >> 1);
+		break;
+	case 2:
+		cs = (x[3] >> 1);
+		break;
+	}
+
+	switch (cs) {
+	case 43: /* BT.2020 */
+		memcpy(hdr10_data.primaries, bt2020_primaries, sizeof(bt2020_primaries));
+		break;
+	case 67: /* DCI-P3 */
+		memcpy(hdr10_data.primaries, p3_primaries, sizeof(p3_primaries));
+		break;
+	case 76: /* BT.709 */
+		memcpy(hdr10_data.primaries, bt709_primaries, sizeof(bt709_primaries));
+		break;
+	default:
+		break;
+	}
+
+	memcpy(hdr10_data.white_point, d65_white_point, sizeof(d65_white_point));
+}
+
+static inline void extract_dolby_vsvdb_source_lum(u16 *min, u16 *max)
+{
+	const unsigned char *x = &new_dovi_setting.vsvdb_tbl[5];
+	const unsigned char version = (x[0] >> 5) & 0x07;
+
+	switch (version) {
+	case 0:
+		*min = (x[14] << 4) | (x[13] >> 4);
+		*max = (x[15] << 4) | (x[13] & 0x0F);
+		break;
+	case 1:
+		*min = min_direct_to_pq_lut[(x[2] >> 1)];
+		*max = xbmc_max_direct_to_pq_lut[(x[1] >> 1)];
+		break;
+	case 2:
+		*min = 20 * (x[1] >> 3);
+		*max = 2055 + 65 * (x[2] >> 3);
+		break;
+	}
+}
+
+static inline void set_hdr10_data_for_dv_ll(void)
+{
+	u16 vsvdb_max = 0;
+	u16 vsvdb_min = 0;
+	u8 vsvdb_max_idx = 0;
+
+	hdr10_data.features =
+		  (1 << 29)   /* 1 video available / present */
+		| (5 << 26)   /* 5 unspecified */
+		| (0 << 25)   /* 0 limited range */
+		| (1 << 24)   /* 1 color available / present */
+		| (9 << 16)   /* 9 primaries bt2020 */
+		| (0x10 << 8) /* 16 transfer char. smpte-st-2084 */
+		| (10 << 0);  /* 10 matrix co. bt2020c / 9  bt2020nc */
+
+	set_dolby_vsvdb_source_cs();
+	extract_dolby_vsvdb_source_lum(&vsvdb_min, &vsvdb_max);
+
+	hdr10_data.luminance[0] =
+		(vsvdb_max < 2852) ? 0x0258 :
+		(vsvdb_max < 3080) ? 0x03E8 :
+		(vsvdb_max < 3389) ? 0x07D0 :
+		(vsvdb_max < 3697) ? 0x0FA0 : 0x2710;
+
+	switch (vsvdb_max) {
+	case 3079:
+		hdr10_data.max_content = 0x041A;
+		break;
+	case 3377:
+		hdr10_data.max_content = 0x0802;
+		break;
+	case 3690:
+		hdr10_data.max_content = 0x0FD2;
+		break;
+	case 4070:
+		hdr10_data.max_content = 0x2710;
+		break;
+	default:
+	{
+		const unsigned char *x = &new_dovi_setting.vsvdb_tbl[5];
+		const unsigned char v = (x[0] >> 5) & 0x07;
+		switch (v) {
+		case 1:
+			vsvdb_max_idx = xbmc_find_closest_lut_index(vsvdb_max, xbmc_max_direct_to_pq_lut, 128) + 1;
+			if (vsvdb_max_idx > 127)
+				hdr10_data.max_content = 0x2710;
+			else
+				hdr10_data.max_content = xbmc_max_direct_to_nits_lut[vsvdb_max_idx];
+			break;
+		case 2:
+			vsvdb_max_idx = xbmc_find_closest_lut_index(vsvdb_max, xbmc_max_direct_to_pq_lut_2, 32) + 1;
+			if (vsvdb_max_idx > 30)
+				hdr10_data.max_content = 0x2710;
+			else
+				hdr10_data.max_content = xbmc_max_direct_to_nits_lut_2_adj[vsvdb_max_idx];
+			break;
+		default:
+			break;
+		}
+		break;
+	}
+	}
+
+	hdr10_data.max_frame_average = hdr10_data.max_content * 4 / 10;
+
+	hdr10_data.luminance[1] =
+		(vsvdb_min < 10) ? 0x0001 :
+		(vsvdb_min < 17) ? 0x0002 :
+		(vsvdb_min < 26) ? 0x0005 :
+		(vsvdb_min < 38) ? 0x000A :
+		(vsvdb_min < 62) ? 0x0014 : 0x0032;
+
+	xbmc_dv_hdr10_for_dv_ll_inject_num += 1;
 }
 
 static void set_hdr10_data_for_lldv(void)
@@ -4291,6 +4583,75 @@ static void send_hdmi_pkt
 				hdr10_data.max_frame_average);
 		}
 
+	} else if ((dst_format == FORMAT_DOVI) && dovi_setting.dovi_ll_enable && xbmc_dv_hdr10_for_dv_ll) {
+
+		sdr_transition_delay = 0;
+
+		if (((xbmc_dv_vp == 1) || (xbmc_dv_vp == 2)) &&
+		    ((src_format == FORMAT_DOVI) || (src_format == FORMAT_DOVI_LL)) &&
+		    (xbmc_dv_hdr10_for_dv_ll_inject_num < 24)) {
+
+			hdr10_data.features =
+				  (1 << 29)   /* 1 video available / present */
+				| (5 << 26)   /* 5 unspecified */
+				| (0 << 25)   /* 0 limited range */
+				| (1 << 24)   /* 1 color available / present */
+				| (9 << 16)   /* 9 primaries bt2020 */
+				| (0x10 << 8) /* 16 transfer char. smpte-st-2084 */
+				| (10 << 0);  /* 10 matrix co. bt2020c / 9  bt2020nc */
+
+			set_dolby_vsvdb_source_cs();
+
+			xbmc_dv_md_source_max_pq = (md_buf[current_id][66] << 8) | md_buf[current_id][67];
+
+			hdr10_data.luminance[0] =
+				(xbmc_dv_md_source_max_pq == 3079) ? 0x03E8 :
+				(xbmc_dv_md_source_max_pq == 3388) ? 0x07D0 :
+				(xbmc_dv_md_source_max_pq == 3696) ? 0x0FA0 :
+				(xbmc_dv_md_source_max_pq == 4095) ? 0x2710 :
+				(xbmc_dv_md_level_6_max_lum != 0)  ? xbmc_dv_md_level_6_max_lum : xbmc_dv_hdr10_max_lum;
+
+			xbmc_dv_md_source_min_pq = ((md_buf[current_id][64] << 8) | md_buf[current_id][65]);
+
+			hdr10_data.luminance[1] =
+				(xbmc_dv_md_source_min_pq == 0)   ? 0x0001 :
+				(xbmc_dv_md_source_min_pq == 7)   ? 0x0001 :
+				(xbmc_dv_md_source_min_pq == 10)  ? 0x0002 :
+				(xbmc_dv_md_source_min_pq == 17)  ? 0x0005 :
+				(xbmc_dv_md_source_min_pq == 26)  ? 0x000A :
+				(xbmc_dv_md_source_min_pq == 38)  ? 0x0014 :
+				(xbmc_dv_md_source_min_pq == 62)  ? 0x0032 :
+				(xbmc_dv_md_level_6_min_lum != 0) ? xbmc_dv_md_level_6_min_lum : xbmc_dv_hdr10_min_lum;
+
+			if (xbmc_dv_el_type == 1) {
+				hdr10_data.max_content = (xbmc_dv_md_level_6_max_cll != 0) ? xbmc_dv_md_level_6_max_cll : xbmc_dv_hdr10_max_cll;
+				hdr10_data.max_frame_average = (xbmc_dv_md_level_6_max_fall != 0) ? xbmc_dv_md_level_6_max_fall : xbmc_dv_hdr10_max_fall;
+			} else if (xbmc_dv_profile == 5) {
+				hdr10_data.max_content = xbmc_dv_md_level_6_max_cll;
+				hdr10_data.max_frame_average = xbmc_dv_md_level_6_max_fall;
+			} else {
+				if (xbmc_dv_md_level_6_max_cll > xbmc_dv_hdr10_max_cll) {
+					hdr10_data.max_content = xbmc_dv_md_level_6_max_cll;
+					hdr10_data.max_frame_average = xbmc_dv_md_level_6_max_fall;
+				} else {
+					hdr10_data.max_content = xbmc_dv_hdr10_max_cll;
+					hdr10_data.max_frame_average = xbmc_dv_hdr10_max_fall;
+				}
+			}
+			xbmc_dv_hdr10_for_dv_ll_inject_num += 1;
+		} else {
+			if (xbmc_dv_hdr10_for_dv_ll_inject_num < 24)
+				set_hdr10_data_for_dv_ll();
+		}
+
+		if (vinfo && vinfo->vout_device &&
+		    vinfo->vout_device->fresh_tx_hdr_pkt)
+			vinfo->vout_device->fresh_tx_hdr_pkt(&hdr10_data);
+
+		last_dst_format = dst_format;
+		vd_signal.signal_type = SIGNAL_HDR10;
+		notify_vd_signal_to_amvideo(&vd_signal);
+
 	} else if (dst_format == FORMAT_DOVI && dovi_setting.dovi_ll_enable && dolby_vision_hdr_for_lldv) {
 
 		sdr_transition_delay = 0;
@@ -4339,11 +4700,18 @@ static void send_hdmi_pkt
 		if (vinfo && vinfo->vout_device && vinfo->vout_device->fresh_tx_vsif_pkt)
 		{
 			if (dovi_setting.dovi_ll_enable) {
+				enum mode_type ll_fmt;
+				if (xbmc_dv_vp == 5 || xbmc_dv_vp == 7)
+					ll_fmt = RGB_10_12BIT;
+				else if (xbmc_dv_vp == 4 || xbmc_dv_vp == 6)
+					ll_fmt = YUV444_10_12BIT;
+				else
+					ll_fmt = dovi_setting.diagnostic_enable
+					           ? RGB_10_12BIT
+					           : YUV422_BIT12;
 				vinfo->vout_device->fresh_tx_vsif_pkt(
 				                    EOTF_T_LL_MODE,
-				                    dovi_setting.diagnostic_enable
-				                      ? RGB_10_12BIT 
-				                      : YUV422_BIT12,
+				                    ll_fmt,
 				                    &vsif, false);
 			} else {
 				vinfo->vout_device->fresh_tx_vsif_pkt(
@@ -4462,19 +4830,26 @@ static void send_hdmi_pkt_ahead
 		if (vinfo && vinfo->vout_device &&
 			vinfo->vout_device->fresh_tx_vsif_pkt)
 		{
-			if (dovi_ll_enable)
+			if (dovi_ll_enable) {
+				enum mode_type ll_fmt;
+				if (xbmc_dv_vp == 5 || xbmc_dv_vp == 7)
+					ll_fmt = RGB_10_12BIT;
+				else if (xbmc_dv_vp == 4 || xbmc_dv_vp == 6)
+					ll_fmt = YUV444_10_12BIT;
+				else
+					ll_fmt = diagnostic_enable
+					           ? RGB_10_12BIT
+					           : YUV422_BIT12;
 				vinfo->vout_device->fresh_tx_vsif_pkt(
 				                    EOTF_T_DV_AHEAD,
-				                    diagnostic_enable
-				                      ? RGB_10_12BIT
-				                      : YUV422_BIT12,
+				                    ll_fmt,
 				                    &vsif, false);
-			else
+			} else
 				vinfo->vout_device->fresh_tx_vsif_pkt(
 				                    EOTF_T_DV_AHEAD,
-				                    dolby_vision_target_mode == dovi_ll_enable
-				                      ? YUV422_BIT12
-				                      : RGB_8BIT,
+				                    (dolby_vision_target_mode == DOLBY_VISION_OUTPUT_MODE_IPT_TUNNEL)
+				                      ? RGB_8BIT
+				                      : YUV422_BIT12,
 				                    &vsif, false);
 		}
 		pr_dolby_dbg("send_hdmi_pkt ahead: %s\n", dovi_ll_enable ? "LL" : "DV");
@@ -4535,58 +4910,10 @@ static inline void extract_etsi_source_lum(u16* min, u16* max)
   *max = (md_buf[current_id][66] << 8) | md_buf[current_id][67]; // two bytes from the buffer for source max into the unsigned short 
 }
 
-// SMPTE ST.2084 (min) direct PQ lookup table
-static const u16 min_direct_to_pq_lut[128] = {
-    0,   5,  12,  19,  26,  33,  40,  47,  55,  62,  69,  76,  83,  90,  97, 104,
-  111, 117, 124, 130, 137, 143, 150, 156, 162, 168, 174, 180, 186, 192, 198, 204,
-  210, 216, 221, 227, 233, 238, 244, 249, 254, 260, 265, 270, 276, 281, 286, 291,
-  296, 301, 306, 311, 316, 321, 326, 331, 335, 340, 345, 350, 354, 359, 364, 368,
-  373, 377, 382, 386, 391, 395, 399, 404, 408, 412, 417, 421, 425, 429, 433, 438,
-  442, 446, 450, 454, 458, 462, 466, 470, 474, 478, 482, 486, 490, 493, 497, 501,
-  505, 509, 512, 516, 520, 524, 527, 531, 535, 538, 542, 545, 549, 553, 556, 560,
-  563, 567, 570, 574, 577, 580, 584, 587, 591, 594, 597, 601, 604, 607, 611, 614
-};
-
-// SMPTE ST.2084 (max) direct PQ lookup table
-static const u16 max_direct_to_pq_lut[128] = {
-  2081, 2249, 2372, 2467, 2547, 2614, 2672, 2724, 2771, 2813, 2851, 2887, 2920, 2950, 2979, 3006,
-  3032, 3056, 3079, 3101, 3121, 3141, 3160, 3178, 3196, 3213, 3229, 3245, 3260, 3275, 3289, 3302,
-  3316, 3329, 3341, 3354, 3365, 3377, 3388, 3399, 3410, 3421, 3431, 3441, 3451, 3460, 3470, 3479,
-  3488, 3497, 3505, 3514, 3522, 3530, 3538, 3546, 3554, 3561, 3569, 3576, 3583, 3590, 3597, 3604,
-  3611, 3618, 3624, 3631, 3637, 3643, 3649, 3656, 3662, 3668, 3673, 3679, 3685, 3690, 3696, 3702,
-  3707, 3712, 3718, 3723, 3728, 3733, 3738, 3743, 3748, 3753, 3758, 3762, 3767, 3772, 3776, 3781,
-  3785, 3790, 3794, 3799, 3803, 3807, 3811, 3816, 3820, 3824, 3828, 3832, 3836, 3840, 3844, 3848,
-  3852, 3855, 3859, 3863, 3867, 3870, 3874, 3878, 3881, 3885, 3888, 3892, 3895, 3899, 3902, 3906
-};
-
-static inline void extract_dolby_vsvdb_source_lum(u16* min, u16* max) 
-{
-  const unsigned char *x = &new_dovi_setting.vsvdb_tbl[5];
-  unsigned char version = (x[0] >> 5) & 0x07;
-
-  switch (version) {
-
-    case 0: {
-      *min = (x[14] << 4) | (x[13] >> 4);
-      *max = (x[15] << 4) | (x[13] & 0x0F);
-      break;
-    }
-
-    case 1: {
-      *min = min_direct_to_pq_lut[(x[2] >> 1)];
-      *max = max_direct_to_pq_lut[(x[1] >> 1)];
-      break;
-    }
-
-    case 2: {
-      *min = 20 * (x[1] >> 3);
-      *max = 2055 + 65 * (x[2] >> 3);
-      break;
-    }
-  }
-
-  pr_info("DOLBY: extract vsvdb lum: version [%d], min [%hu] max [%hu]\n", version, *min, *max);
-}
+/* min_direct_to_pq_lut is now defined earlier (before set_hdr10_data_for_dv_ll) */
+/* max_direct_to_pq_lut is now defined earlier as xbmc_max_direct_to_pq_lut */
+#define max_direct_to_pq_lut xbmc_max_direct_to_pq_lut
+/* extract_dolby_vsvdb_source_lum is now defined earlier */
 
 static inline u8 find_closest_lut_index(u16 value, const u16 *lut, int lut_size)
 {
@@ -4722,48 +5049,69 @@ static inline void set_dolby_vsvdb_when_changed(const unsigned char *vsvdb_tbl, 
     set_dolby_vsvdb(vsvdb_tbl, vsvdb_len);
 }
 
-static inline void load_dolby_vsvdb(const struct dv_info *dv_info)
+static inline void load_dolby_vsvdb(const struct dv_info *dv_info, enum signal_format_enum src_format)
 {
+  bool dovi_cap = ((dv_info->ieeeoui == 0x00d046) && (dv_info->block_flag == CORRECT));
 
-  if (dolby_vision_dolby_vsvdb_inject == 1) { // inject dolby vsvdb when asked.
+  // For Display Led (VP=0): load VSVDB from HDMI sink
+  if (dovi_cap && (xbmc_dv_vp == 0)) {
+    set_dolby_vsvdb(NULL, 0);
+    set_dolby_vsvdb(&dv_info->rawdata[0], dv_info->length + 1);
 
-    // Get the DOLBY VSVDB from the parameter
-    size_t payload_str_len = strlen(dolby_vision_dolby_vsvdb_payload);
+    // V2-to-V1 conversion for Player Led (non-inject) mode
+    if ((xbmc_dv_type != 0) && !xbmc_dv_vsvdb_inject) {
+      unsigned char *x = &new_dovi_setting.vsvdb_tbl[5];
+      const unsigned char v = (x[0] >> 5) & 0x07;
+      u16 vsvdb_max = 0;
+      u16 vsvdb_min = 0;
+      extract_dolby_vsvdb_source_lum(&vsvdb_min, &vsvdb_max);
+
+      if ((src_format == FORMAT_DOVI) || (src_format == FORMAT_DOVI_LL))
+        xbmc_dv_md_source_max_pq = (md_buf[current_id][66] << 8) | md_buf[current_id][67];
+      else
+        xbmc_dv_md_source_max_pq = vsvdb_max;
+
+      if ((v == 2) && (((vsvdb_max > 2671) && (vsvdb_max < 3907)) || ((vsvdb_max > 3906) && (xbmc_dv_md_source_max_pq != 4095)))) {
+        unsigned char temp, temp_2;
+        x[0] = 0x27;
+        u8 max_idx_2 = x[2] >> 3;
+        u16 temp_max_2 = xbmc_max_direct_to_pq_lut_2[max_idx_2];
+        u8 max_idx_1 = xbmc_find_closest_lut_index(temp_max_2, xbmc_max_direct_to_pq_lut, 128);
+        if ((max_idx_1 > 17) && (max_idx_1 < 127)) max_idx_1 = max_idx_1 + 1;
+        x[1] = max_idx_1 << 1;
+        x[2] = 0x01;
+        temp = x[3];
+        x[3] = (x[5] << 5) | ((x[6] << 2) & 0x1C) | 0x01;
+        temp_2 = x[4];
+        x[4] = (temp & 0xFE) | ((x[6] >> 3) & 0x01);
+        temp = x[5];
+        x[5] = (temp_2 & 0xFE) | ((x[6] >> 4) & 0x01);
+        temp_2 = x[6];
+        x[6] = (temp & 0xF8) | (temp_2 >> 5);
+      }
+    }
+  }
+
+  // For VP mode, or when DV cap missing, or when injecting: use payload from Kodi
+  if (!dovi_cap || (xbmc_dv_vp != 0) || ((xbmc_dv_type != 0) && xbmc_dv_vsvdb_inject)) {
+    size_t payload_str_len = strlen(xbmc_dv_vsvdb_payload);
+    if (payload_str_len != 14) {
+      pr_info("DOLBY: inject_dolby_vsvdb failed - Cannot parse: Length wrong, must be a Dolby VSVDB V1 or V2 - 14 Hex Char Payload. [%s]\n", xbmc_dv_vsvdb_payload);
+      return;
+    }
     char dolby_vsvdb[25];
     unsigned char buf[12];
     unsigned int i = 0;
-
-    if (payload_str_len != 14) {
-      pr_info("DOLBY: inject_dolby_vsvdb failed - Cannot parse: Length wrong, must be a Dolby VSVDB V1 or V2 - 14 Hex Char Payload. [%s]\n", dolby_vision_dolby_vsvdb_payload);
-      return;
-    }
-
-    strcpy(dolby_vsvdb, "EB0146D000"); // VSVDB Header and Dolby IEEE OUI
-    strcat(dolby_vsvdb, dolby_vision_dolby_vsvdb_payload);
-
-    // Convert from hex in string to bytes
+    strcpy(dolby_vsvdb, "EB0146D000");
+    strcat(dolby_vsvdb, xbmc_dv_vsvdb_payload);
     for (i = 0; i < 12; i++) {
       char hex_byte[3] = { dolby_vsvdb[i*2], dolby_vsvdb[(i*2)+1], '\0' };
       buf[i] = (unsigned char)(simple_strtoul(hex_byte, NULL, 16) & 0xFF);
     }
-
+    set_dolby_vsvdb(NULL, 0);
     set_dolby_vsvdb(buf, 12);
-
-    dolby_vision_dolby_vsvdb_inject = 2; // do not inject again
-
-  } else if (dolby_vision_dolby_vsvdb_inject == 0) { // Not injecting get from HDMI.
-
-    // One-time, initialise to 0 - TODO: why needed.
-    if (!vsvdb_config_set_flag) {
-      set_dolby_vsvdb(NULL, 0);
-      vsvdb_config_set_flag = true;
-    }
-
-    // if have a dolby vsvdb from HDMI, set if different to current.
-    if ((dv_info->ieeeoui    == 0x00d046) &&
-        (dv_info->block_flag == CORRECT))
-      set_dolby_vsvdb_when_changed(&dv_info->rawdata[0], dv_info->length + 1);
   }
+  xbmc_dv_vsvdb_inject_num += 1;
 }
 
 #define ETSI_META_OFFSET 71
@@ -4881,89 +5229,109 @@ static inline void source_meta_copy(
   uint8_t level = 0;
   bool level_1_done = false;
   bool level_3_done = false;
-  bool level_5_handled = (dolby_vision_keep_source_meta_level_5 == 0);
+  bool level_5_done = false;
+  bool level_9_done = false;
+  bool level_11_done = false;
+  bool level_254_done = false;
+  bool convert_to_hdr10plus = false;
+  bool allow_level_5_source = (xbmc_meta_level_5 && !(xbmc_meta_level_5_osdst && (dolby_vision_xbmc_osd || dolby_vision_subtitles)));
 
   while ((orig_index < orig_end_index) &&
          (remaining_input >= 5) &&
-         (remaining_space >= 5)) {
+         (remaining_space >= 5))
+  {
 
     size_t level_size = be32_to_cpup((__be32 *)orig_index);
     level = orig_index[4];
     level_size += 5; // complete level size includes the space for the size information itself (4) and level (1)
 
-    if (level_size > remaining_space || level_size > remaining_input) {
+    if (level_size > remaining_space || level_size > remaining_input)
+    {
       pr_err("Invalid metadata: Level size exceeds remaining space or input\n");
       break;
     }
 
-    // Choose what to copy
-    if (!level_5_handled && (level >= 5))
+    if ((level > 5) && !level_5_done && level_1_done)
     {
-      if ((level >= 6) ||
-          ( (dolby_vision_keep_source_meta_level_5 == 2) ||
-           ((dolby_vision_keep_source_meta_level_5 == 3) && (dolby_vision_xbmc_osd || dolby_vision_subtitles)) ||
-           ((dolby_vision_keep_source_meta_level_5 == 4) &&  dolby_vision_xbmc_osd)))
-      {
-        if ((level == 5) && (level_size != LEVEL_5_LENGTH)) {
-          pr_err("Invalid metadata: Level 5 size mismatch (%zu)\n", level_size);
-          break;
-        }
-        memcpy(combo_index, LEVEL_5_DATA, LEVEL_5_LENGTH);
-        combo_index += LEVEL_5_LENGTH;
-        combo_meta_size += LEVEL_5_LENGTH;
-        remaining_space -= LEVEL_5_LENGTH;
-        num_levels++;
-        level_5_handled = true;
-      }
+      memcpy(combo_index, LEVEL_5_DATA, LEVEL_5_LENGTH);
+      combo_index += LEVEL_5_LENGTH;
+      combo_meta_size += LEVEL_5_LENGTH;
+      remaining_space -= LEVEL_5_LENGTH;
+      num_levels++;
+      level_5_done = true;
     }
 
-    if (((level != 5) && (level != 6)) ||
-        ((level == 5) && !level_5_handled) ||
-        ((level == 6) && (dolby_vision_keep_source_meta_level_6 == 1)))
+    if (level != 5 || ((level == 5) && allow_level_5_source))
     {
+      if (level == 5)
+        level_5_done = true;
       memcpy(combo_index, orig_index, level_size);
       combo_index += level_size;
       combo_meta_size += level_size;
       remaining_space -= level_size;
       num_levels++;
-      if (level == 5) level_5_handled = true;
-      if (level == 1) level_1_done = true;
-      if (level == 3) level_3_done = true;
+      switch (level)
+      {
+        case 1:
+          level_1_done = true;
+          break;
+        case 3:
+          level_3_done = true;
+          break;
+        case 9:
+          level_9_done = true;
+          break;
+        case 11:
+          level_11_done = true;
+          break;
+        case 254:
+          level_254_done = true;
+          break;
+        default:
+          break;
+      }
     }
 
     orig_index += level_size;
     remaining_input -= level_size;
   }
 
-  if ((level < 3) && level_1_done && xbmc_dv_hdr10plus_conv) {
-    memcpy(combo_index, LEVEL_3_DATA, LEVEL_3_LENGTH);
-    combo_index += LEVEL_3_LENGTH;
-    combo_meta_size += LEVEL_3_LENGTH;
-    num_levels++;
-  }
+  convert_to_hdr10plus = (level_1_done && xbmc_dv_hdr10plus_conv);
 
-  if ((level < 5) && level_1_done) {
+  if (!level_5_done && level_1_done)
+  {
     memcpy(combo_index, LEVEL_5_DATA, LEVEL_5_LENGTH);
     combo_index += LEVEL_5_LENGTH;
     combo_meta_size += LEVEL_5_LENGTH;
     num_levels++;
   }
 
-  if ((level < 9) && level_1_done && xbmc_dv_hdr10plus_conv) {
+  if (!level_3_done && convert_to_hdr10plus)
+  {
+    memcpy(combo_index, LEVEL_3_DATA, LEVEL_3_LENGTH);
+    combo_index += LEVEL_3_LENGTH;
+    combo_meta_size += LEVEL_3_LENGTH;
+    num_levels++;
+  }
+
+  if (!level_9_done && convert_to_hdr10plus)
+  {
     memcpy(combo_index, LEVEL_9_DATA, LEVEL_9_LENGTH);
     combo_index += LEVEL_9_LENGTH;
     combo_meta_size += LEVEL_9_LENGTH;
     num_levels++;
   }
 
-  if ((level < 11) && level_1_done && xbmc_dv_hdr10plus_conv) {
+  if (!level_11_done && convert_to_hdr10plus)
+  {
     memcpy(combo_index, LEVEL_11_DATA, LEVEL_11_LENGTH);
     combo_index += LEVEL_11_LENGTH;
     combo_meta_size += LEVEL_11_LENGTH;
     num_levels++;
   }
 
-  if ((level < 254) && level_1_done && xbmc_dv_hdr10plus_conv) {
+  if (!level_254_done && convert_to_hdr10plus)
+  {
     memcpy(combo_index, LEVEL_254_DATA, LEVEL_254_LENGTH);
     combo_index += LEVEL_254_LENGTH;
     combo_meta_size += LEVEL_254_LENGTH;
@@ -5509,10 +5877,12 @@ int dolby_vision_parse_metadata(struct vframe_s *vf,
 	}
 
 	// Load the VSVDB from xbmc if injected or obtain from vout (hdmi sink) if present.
-	load_dolby_vsvdb(vinfo->vout_device->dv_info);
+	if (xbmc_dv_vsvdb_inject_num < 24)
+		load_dolby_vsvdb(vinfo->vout_device->dv_info, src_format);
 
 	// For DV-LL apply limits to the VSVDB min and max, when we have source metadata.
-	if (total_md_size > 0) limit_dolby_vsvdb_to_source_lum_for_lldv();
+	// Skip in VP mode - VP handles its own tone mapping.
+	if (total_md_size > 0 && xbmc_dv_vp == 0) limit_dolby_vsvdb_to_source_lum_for_lldv();
 
 	/* check video/graphics priority on the fly */
 	/* cert: some graphic test also need video pri 5223,5243,5253,5263 */
@@ -5569,6 +5939,44 @@ int dolby_vision_parse_metadata(struct vframe_s *vf,
 	new_dovi_setting.video_width = w << 16;
 	new_dovi_setting.video_height = h << 16;
 
+	/* VP mode: force standard DV processing, override LL */
+	if ((xbmc_dv_vp != 0) && (xbmc_dv_vp_tm > 1) &&
+	    ((src_format == FORMAT_DOVI) || (src_format == FORMAT_DOVI_LL))) {
+		new_dovi_setting.use_ll_flag = 0;
+		dolby_vision_target_max[FORMAT_DOVI][FORMAT_DOVI] = 10000;
+	}
+
+	/* Level 1 min luminance clamping for DV-LL (non-VP) */
+	if ((xbmc_dv_vp == 0) && is_dv_ll() &&
+	    ((src_format == FORMAT_DOVI) || (src_format == FORMAT_DOVI_LL))) {
+		unsigned char* temp_index = md_buf[current_id] + ETSI_META_OFFSET;
+		unsigned char* md_index = md_buf[current_id] + ETSI_META_OFFSET;
+		unsigned char* md_end_index = md_buf[current_id] + total_md_size;
+		size_t l1_remaining_input = total_md_size - ETSI_META_OFFSET;
+		size_t l1_remaining_space = total_md_size - ETSI_META_OFFSET;
+		while ((md_index < md_end_index) &&
+		       (l1_remaining_input >= 5) &&
+		       (l1_remaining_space >= 5)) {
+			size_t level_size = be32_to_cpup((__be32 *)md_index);
+			uint8_t level = md_index[4];
+			level_size += 5;
+			if (level_size > l1_remaining_space || level_size > l1_remaining_input)
+				break;
+			if ((level == 1) && (((temp_index[5] << 8) | temp_index[6]) < 17)) {
+				temp_index[5] = 0x00;
+				temp_index[6] = 0x11;
+				memcpy(md_index, temp_index, level_size);
+				temp_index += level_size;
+				l1_remaining_space -= level_size;
+			} else {
+				temp_index += level_size;
+				l1_remaining_space -= level_size;
+			}
+			md_index += level_size;
+			l1_remaining_input -= level_size;
+		}
+	}
+
 	if (debug_dolby & 0x400)
 		do_gettimeofday(&start);
 
@@ -5589,8 +5997,10 @@ int dolby_vision_parse_metadata(struct vframe_s *vf,
 			                &hdr10_param,
 			                &new_dovi_setting);
 
-		// Override the dovi.ko metadata levels with the original from source
-		if (dolby_vision_use_source_meta_levels && (src_format == FORMAT_DOVI))
+		// Copy original source metadata for standard DV (non-LL) output
+		if ((src_format == FORMAT_DOVI) && (dst_format == FORMAT_DOVI) &&
+		    !((dolby_vision_flags & FLAG_FORCE_DOVI_LL) ||
+		      dolby_vision_ll_policy >= DOLBY_VISION_LL_YUV422))
 			source_meta_copy(md_buf[current_id], total_md_size, &new_dovi_setting.md_reg3);
 	}
 

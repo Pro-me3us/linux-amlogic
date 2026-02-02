@@ -3893,6 +3893,18 @@ static ssize_t _show_dv_cap(struct device *dev,
 		pos += snprintf(buf+pos, PAGE_SIZE, "%02x",
 		dv->rawdata[i]);
 	pos += snprintf(buf + pos, PAGE_SIZE, "\n");
+	pos += snprintf(buf + pos, PAGE_SIZE,
+		"Length: %d\n", dv->length);
+	pos += snprintf(buf + pos, PAGE_SIZE,
+		"TmaxM: %dnti\n", dv->tmaxLUM);
+	pos += snprintf(buf + pos, PAGE_SIZE,
+		"TmaxQ: %dpqi\n", dv->tmaxPQ);
+	pos += snprintf(buf + pos, PAGE_SIZE,
+		"Rx: %drxi\nRy: %dryi\n", dv->Rx, dv->Ry);
+	pos += snprintf(buf + pos, PAGE_SIZE,
+		"Gx: %dgxi\nGy: %dgyi\n", dv->Gx, dv->Gy);
+	pos += snprintf(buf + pos, PAGE_SIZE,
+		"Bx: %dbxi\nBy: %dbyi\n", dv->Bx, dv->By);
 	return pos;
 }
 
