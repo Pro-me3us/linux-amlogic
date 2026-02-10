@@ -5261,7 +5261,7 @@ static inline void source_meta_copy(
       level_5_done = true;
     }
 
-    if (level != 5 || ((level == 5) && allow_level_5_source))
+    if ((level != 5 || (level == 5 && allow_level_5_source)) && level != 6)
     {
       if (level == 5)
         level_5_done = true;
